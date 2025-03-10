@@ -1,0 +1,115 @@
+.mosh-ship-console {
+  font-family: 'Courier New', monospace;
+  color: #33ff33;
+  background-color: #000;
+}
+
+.mosh-terminal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #33ff33;
+  background-color: #000;
+  overflow: hidden;
+}
+
+.terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  padding-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.terminal-input-line {
+  display: flex;
+  margin-top: 5px;
+  border-top: 1px solid #33ff33;
+  padding-top: 5px;
+}
+
+.terminal-prompt {
+  color: #33ff33;
+  margin-right: 5px;
+}
+
+.terminal-input {
+  flex: 1;
+  background-color: transparent;
+  border: none;
+  color: #33ff33;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  outline: none;
+}
+
+.journal-content {
+  background-color: #001100;
+  padding: 8px;
+  border: 1px solid #33ff33;
+  margin: 5px 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.terminal-output::-webkit-scrollbar,
+.journal-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.terminal-output::-webkit-scrollbar-track,
+.journal-content::-webkit-scrollbar-track {
+  background: #000; 
+}
+ 
+.terminal-output::-webkit-scrollbar-thumb,
+.journal-content::-webkit-scrollbar-thumb {
+  background: #33ff33; 
+}
+
+/* CRT effect */
+.mosh-terminal-container::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Slight screen flicker animation */
+@keyframes flicker {
+  0% { opacity: 0.99; }
+  5% { opacity: 0.96; }
+  10% { opacity: 0.99; }
+  15% { opacity: 0.98; }
+  20% { opacity: 0.99; }
+  25% { opacity: 0.97; }
+  30% { opacity: 0.99; }
+  35% { opacity: 0.95; }
+  40% { opacity: 0.99; }
+  45% { opacity: 0.96; }
+  50% { opacity: 0.99; }
+  55% { opacity: 0.98; }
+  60% { opacity: 0.99; }
+  65% { opacity: 0.97; }
+  70% { opacity: 0.99; }
+  75% { opacity: 0.96; }
+  80% { opacity: 0.99; }
+  85% { opacity: 0.98; }
+  90% { opacity: 0.99; }
+  95% { opacity: 0.97; }
+  100% { opacity: 0.99; }
+}
+
+.mosh-terminal-container {
+  animation: flicker 3s infinite;
+}
