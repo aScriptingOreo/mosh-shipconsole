@@ -1,5 +1,6 @@
 export class ShipConsole {
   constructor() {
+    console.log("MoSh-ShipConsole | ShipConsole class constructed");
     this.console = null;
     this.currentJournalEntries = [];
     this.history = [];
@@ -7,7 +8,15 @@ export class ShipConsole {
   }
 
   async toggle() {
+    console.log("MoSh-ShipConsole | Toggle method called");
+    
+    if (this.console && !this.console.rendered) {
+      console.log("MoSh-ShipConsole | Console exists but not rendered - cleaning up");
+      this.console = null;
+    }
+    
     if (this.console) {
+      console.log("MoSh-ShipConsole | Closing existing console");
       this.console.close();
       this.console = null;
       return;
@@ -17,32 +26,32 @@ export class ShipConsole {
   }
 
   async render() {
-    const templatePath = "modules/MoSh-ShipConsole/templates/console.html";
+    console.log("MoSh-ShipConsole | Rendering console");
     
-    this.console = new ShipConsoleApplication({
-      title: game.i18n.localize("MOSH-SHIPCONSOLE.window-title"),
-      width: 600,
-      height: 500,
-      resizable: true
-    });
+    this.console = new ShipConsoleApplication();
     
-    this.console.render(true);
+    console.log("MoSh-ShipConsole | Console application created, rendering now");
+    await this.console.render(true);
   }
 }
 
 class ShipConsoleApplication extends Application {
   static get defaultOptions() {
+    console.log("MoSh-ShipConsole | Getting application default options");
     return mergeObject(super.defaultOptions, {
       id: "mosh-ship-console",
       template: "modules/MoSh-ShipConsole/templates/console.html",
       width: 600,
       height: 500,
       resizable: true,
-      classes: ["mosh-ship-console"]
+      classes: ["mosh-ship-console"],
+      popOut: true,
+      title: game.i18n.localize("MOSH-SHIPCONSOLE.window-title")
     });
   }
 
   getData(options) {
+    console.log("MoSh-ShipConsole | Getting application data");
     return {
       welcome: game.i18n.localize("MOSH-SHIPCONSOLE.welcome"),
       prompt: game.i18n.localize("MOSH-SHIPCONSOLE.prompt"),
@@ -63,6 +72,7 @@ class ShipConsoleApplication extends Application {
   }
 
   activateListeners(html) {
+    console.log("MoSh-ShipConsole | Activating listeners");
     super.activateListeners(html);
     
     // Handle terminal input
@@ -179,9 +189,26 @@ class ShipConsoleApplication extends Application {
     this._appendToTerminal(terminal, `Loading: ${journal.name}...`);
     this._appendToTerminal(terminal, "-----------------------------------------");
     
-    // Display journal content within the terminal
-    const journalContent = await TextEditor.enrichHTML(journalEntry.pages.contents[0]?.text?.content || "No content available.", {async: true});
-    terminal.append(`<div class="journal-content">${journalContent}</div>`);
+    try {
+      // Check if journal has pages first
+      if (journalEntry.pages && journalEntry.pages.size > 0) {
+        // Get the first page
+        const firstPage = journalEntry.pages.contents[0];
+        if (firstPage && firstPage.text) {
+          const journalContent = await TextEditor.enrichHTML(firstPage.text.content || "No content available.", {async: true});
+          terminal.append(`<div class="journal-content">${journalContent}</div>`);
+        } else {
+          this._appendToTerminal(terminal, "This entry has no readable content.");
+        }
+      } else {
+        // Fall back to legacy journal format for compatibility
+        const journalContent = await TextEditor.enrichHTML(journalEntry.data.content || "No content available.", {async: true});
+        terminal.append(`<div class="journal-content">${journalContent}</div>`);
+      }
+    } catch (error) {
+      console.error("MoSh-ShipConsole | Error rendering journal:", error);
+      this._appendToTerminal(terminal, "Error rendering journal content.");
+    }
     
     this._appendToTerminal(terminal, "-----------------------------------------");
     this._appendToTerminal(terminal, "Type 'menu' to return to the main menu.");
